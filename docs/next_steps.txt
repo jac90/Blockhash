@@ -1,0 +1,10 @@
+Current high priority TODOs:
+
+- complete IO integration in Blktap2 for Dom0 transparent handling of IO
+- test and stabilise all functionality including FSMetadata format and 
+blockstore code.
+- adapt code for insertion into driver domains to provide resource isolation
+and direct IO handling from guest VMs.
+- add clustering/remote synch capability in blockstore nodes
+- API/management interfaces for blockstore nodes
+

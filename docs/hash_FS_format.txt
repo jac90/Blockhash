@@ -1,0 +1,38 @@
+Purpose:
+Generate a more complex file metadata format to enable efficient storage 
+and access to data. Files are broken down into 4K chunks which are 
+fingerprinted wih a 16 byte MD5 checksum and a second simple 2 byte content
+hash. Data blocks are stored in a separate library named the 'blockstore'.
+The index to the blockstore has a 2 level hierarchy: the 2 byte content hash
+which points to a data offset where the MD5 checksum references are stored.
+Each node has a 4K block reference structure that records the 2 indeces required
+to access each logical block in the blockstore.
+
+Requirements:
+1] Directory structure contained in the name
+2] Each file metadata entry must point to a metadata struct offset 
+3] Each file struct metadata entry held at the 
+start of the disk aligned to a sector boundary
+
+FS header Format:
+Magic String - 2 bytes (set to 0x0F0F)
+64 bit offset - 8 bytes offset to Page lookup entry
+64 bit length - 8 bytes
+Filename - variable length (up to 490), null terminated
+
+Page Lookup Format:
+64 bit Next lookup offset - 8 Bytes
+32Byte bitmask index
+List of Logical file offset entries (up to 253) in the format: 
+     2Byte hash, 14Byte SHA1 hash (cropped)
+
+Blockstore format:
+Magic String - 2 bytes (set to 0xAFAF)
+Fast Hash lookup - 32K in size - 8K x 4 byte entries (held in memory, 0 indicates not allocated)
+
+Full data hash offset:
+4k page
+Fast Hash lookup key - 4 byte entry
+Ordered list of Entries - 20 bytes (16byte hash + 4 byte offset)
+
+

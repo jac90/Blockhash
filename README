@@ -1,0 +1,102 @@
+Blockhash is an open source project to provide a building block for 
+virtual machine storage. Block IO stream data is hashed to produce a
+content signature for any data that is being written to persistent
+storage. Existing blocks are identified and duplicates immediately
+removed. The hash is stored in the virtual device metadata to enable
+subsequent retrieval of data from the blockstore.
+
+FAQ
+===
+What are the benefits of storing and retrieving data in this way?
+1] Virtual machine datasets are massively redundant. Operating system
+images contain significant numbers of duplicate blocks, and general
+OS data processing often produces significant percentages of similar
+data.[see refs] Blockhash provides perfect de-duplication at the source of 
+data sets.
+
+2] Blockstores can be easily synchronised/replicated to provide both
+redundancy of data across physically separate nodes, and parallelisation
+of access to blocks.
+
+3] Mirrored/synchronised blockstores enable wide-area VM migration without
+imposing any additional storage motion delay.
+
+4] Use of blockstores distributed across hypservisor hosts allows use
+of local storage resources to present a single addressable block target.
+Potentially removes the need for expensive SAN disk arrays and can present
+significant energy reduction.
+
+How do we avoid hash collision?
+The hash signature is comprised of a SHA-1 crytpographic hash and a smaller
+CRC-32 signature. Both are generated over the original data set independently.
+We use the 2-tier hash both to index the blocks into 2 levels of lookup 
+tables as well as to massively reduce the possibility of data collisions.
+
+Licensing
+=========
+ALl code contained in this project is provided for free use under a GPL
+license:
+
+  Copyright (C) <2011> Julian Chesterfield <jac90@cl.cam.ac.uk>
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU Library General Public License as
+  published by the Free Software Foundation, version 2.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+  USA
+
+Note that all crypto digest code is taken from David Ireland's excellent
+website, including both the CRC32 algorithm and the SHA-1 code:
+
+http://www.di-mgt.com.au/crypto.html
+
+
+
+Current project status
+======================
+This project is in pre-alpha status and not suitable for actual data storage
+at this point. If you are keen to contribute and/or learn more, please contact
+the author:
+
+Julian Chesterfield <jac90@cl.cam.ac.uk>
+
+References
+==========
+Capo: Recapitulating Storage for Virtual Desktops Mohammad Shamma, Dutch T. Meyer, Jake Wires, Maria Ivanova, Norman C. Hutchinson, and Andrew Warfield. 9th USENIX Conforence on File and Storage Technologies (FAST 2011).
+
+
+Windows VM installation compression analysis:
+
+  2866704 w2k3ee_md5.txt
+ 12022776 win2k8_md5.txt
+  3089568 winxpsp2_md5.txt
+  3380392 winxpsp3_md5.txt
+ 21359440 total
+
+
+raw disk stats:
+16777216  w2k3ee
+50331648  w2k8
+16777216  winxpsp2
+16777216  winxpsp3
+100663296 total
+
+Compressed sector stats:
+2360859  w2k3ee 18%
+6519971  w2k8 46%
+2359302  winxpsp2 24%
+2483766  winxpsp3 27%
+11855854 allwin 45%
+
+Total compression including zero data: 89% 
+192GB of data requires 22GB of space
+
+
